@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Warung Mas Mardi</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            color: white;
+            padding: 30px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 300;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .user-info {
+            text-align: right;
+        }
+
+        .user-avatar {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            margin-left: auto;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+
+        .stat-card.revenue::before {
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+        }
+
+        .stat-card.orders::before {
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+        }
+
+        .stat-card.menu::before {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+        }
+
+        .stat-card.customers::before {
+            background: linear-gradient(135deg, #9b59b6, #8e44ad);
+        }
+
+        .stat-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+
+        .revenue .stat-icon {
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+            color: white;
+        }
+
+        .orders .stat-icon {
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+            color: white;
+        }
+
+        .menu .stat-icon {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+        }
+
+        .customers .stat-icon {
+            background: linear-gradient(135deg, #9b59b6, #8e44ad);
+            color: white;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            color: #7f8c8d;
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+        }
+
+        .stat-change {
+            display: flex;
+            align-items: center;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .stat-change.positive {
+            color: #27ae60;
+        }
+
+        .stat-change.negative {
+            color: #e74c3c;
+        }
+
+        .quick-actions {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .quick-actions h2 {
+            color: #2c3e50;
+            margin-bottom: 30px;
+            font-size: 1.8rem;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        .action-card {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            padding: 30px;
+            border-radius: 15px;
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .action-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+            transform: rotate(45deg);
+            transition: all 0.6s ease;
+            opacity: 0;
+        }
+
+        .action-card:hover::before {
+            animation: shimmer 0.6s ease-in-out;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); opacity: 0; }
+            50% { opacity: 1; }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); opacity: 0; }
+        }
+
+        .action-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+            border-color: #3498db;
+        }
+
+        .action-card.reports {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+        }
+
+        .action-card.menu-management {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+        }
+
+        .action-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            background: rgba(255,255,255,0.2);
+        }
+
+        .action-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .action-card p {
+            opacity: 0.9;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .action-arrow {
+            display: flex;
+            align-items: center;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .recent-activity {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .recent-activity h2 {
+            color: #2c3e50;
+            margin-bottom: 30px;
+            font-size: 1.8rem;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .activity-list {
+            space-y: 20px;
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .activity-item:hover {
+            background: #e9ecef;
+            transform: translateX(5px);
+        }
+
+        .activity-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 20px;
+            font-size: 1.2rem;
+        }
+
+        .activity-icon.transaction {
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+            color: white;
+        }
+
+        .activity-icon.menu {
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+            color: white;
+        }
+
+        .activity-icon.system {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+        }
+
+        .activity-content {
+            flex: 1;
+        }
+
+        .activity-title {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .activity-time {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+
+        .logout-btn {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .logout-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(231, 76, 60, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+                gap: 20px;
+            }
+
+            .user-info {
+                text-align: center;
+            }
+
+            .user-avatar {
+                margin: 0 auto 10px;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                gap: 20px;
+            }
+
+            .actions-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .logout-btn {
+                position: relative;
+                top: auto;
+                right: auto;
+                margin: 20px auto;
+                display: block;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="logout-btn" onclick="logout()">
+        🚪 Logout
+    </button>
+
+    <div class="container">
+        <div class="header">
+            <div class="header-content">
+                <div>
+                    <h1>🏪 Admin Dashboard</h1>
+                    <p>Warung Mas Mardi - Panel Kontrol</p>
+                </div>
+                <div class="user-info">
+                    <div class="user-avatar">👨‍💼</div>
+                    <div>
+                        <strong>Admin User</strong><br>
+                        <small id="currentDateTime"></small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card revenue">
+                <div class="stat-icon">💰</div>
+                <div class="stat-value" id="todayRevenue">Rp 2,450,000</div>
+                <div class="stat-label">Total Pendapatan Hari Ini</div>
+                <div class="stat-change positive">
+                    ↗️ +15.3% dari kemarin
+                </div>
+            </div>
+
+            <div class="stat-card orders">
+                <div class="stat-icon">📋</div>
+                <div class="stat-value" id="todayOrders">87</div>
+                <div class="stat-label">Total Transaksi Hari Ini</div>
+                <div class="stat-change positive">
+                    ↗️ +8 transaksi dari kemarin
+                </div>
+            </div>
+
+            <div class="stat-card menu">
+                <div class="stat-icon">🍽️</div>
+                <div class="stat-value" id="totalMenu">24</div>
+                <div class="stat-label">Total Menu Tersedia</div>
+                <div class="stat-change positive">
+                    ↗️ +2 menu baru minggu ini
+                </div>
+            </div>
+
+            <div class="stat-card customers">
+                <div class="stat-icon">👥</div>
+                <div class="stat-value" id="todayCustomers">65</div>
+                <div class="stat-label">Pelanggan Hari Ini</div>
+                <div class="stat-change positive">
+                    ↗️ +12% dari rata-rata
+                </div>
+            </div>
+        </div>
+
+        <div class="quick-actions">
+            <h2>⚡ Aksi Cepat</h2>
+            <div class="actions-grid">
+                <a href="laporan_page.html" class="action-card reports">
+                    <div class="action-icon">📊</div>
+                    <h3>Laporan Penjualan</h3>
+                    <p>Lihat laporan penjualan harian, mingguan, dan bulanan dengan grafik interaktif</p>
+                    <div class="action-arrow">
+                        Buka Laporan →
+                    </div>
+                </a>
+
+                <a href="menu_management.html" class="action-card menu-management">
+                    <div class="action-icon">🍴</div>
+                    <h3>Manajemen Menu</h3>
+                    <p>Kelola menu restoran, tambah item baru, update harga, dan atur ketersediaan</p>
+                    <div class="action-arrow">
+                        Kelola Menu →
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <div class="recent-activity">
+            <h2>🕐 Aktivitas Terbaru</h2>
+            <div class="activity-list">
+                <div class="activity-item">
+                    <div class="activity-icon transaction">💳</div>
+                    <div class="activity-content">
+                        <div class="activity-title">Transaksi #0089 - Rp 125,000</div>
+                        <div class="activity-time">2 menit yang lalu</div>
+                    </div>
+                </div>
+
+                <div class="activity-item">
+                    <div class="activity-icon menu">🍛</div>
+                    <div class="activity-content">
+                        <div class="activity-title">Menu "Nasi Gudeg Special" ditambahkan</div>
+                        <div class="activity-time">15 menit yang lalu</div>
+                    </div>
+                </div>
+
+                <div class="activity-item">
+                    <div class="activity-icon transaction">💳</div>
+                    <div class="activity-content">
+                        <div class="activity-title">Transaksi #0088 - Rp 85,000</div>
+                        <div class="activity-time">23 menit yang lalu</div>
+                    </div>
+                </div>
+
+                <div class="activity-item">
+                    <div class="activity-icon system">⚙️</div>
+                    <div class="activity-content">
+                        <div class="activity-title">Backup data berhasil dilakukan</div>
+                        <div class="activity-time">1 jam yang lalu</div>
+                    </div>
+                </div>
+
+                <div class="activity-item">
+                    <div class="activity-icon menu">🍝</div>
+                    <div class="activity-content">
+                        <div class="activity-title">Harga "Mie Ayam Bakso" diperbarui</div>
+                        <div class="activity-time">2 jam yang lalu</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Update date and time
+        function updateDateTime() {
+            const now = new Date();
+            const options = {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            };
+            document.getElementById('currentDateTime').textContent = 
+                now.toLocaleDateString('id-ID', options);
+        }
+
+        // Simulate real-time data updates
+        function updateStats() {
+            // Simulate random increments for demo
+            const revenueElement = document.getElementById('todayRevenue');
+            const ordersElement = document.getElementById('todayOrders');
+            const customersElement = document.getElementById('todayCustomers');
+
+            // Generate random increments (small increases throughout the day)
+            const currentRevenue = parseInt(revenueElement.textContent.replace(/[^\d]/g, ''));
+            const currentOrders = parseInt(ordersElement.textContent);
+            const currentCustomers = parseInt(customersElement.textContent);
+
+            // Small random increases
+            if (Math.random() > 0.7) { // 30% chance of update
+                const newRevenue = currentRevenue + Math.floor(Math.random() * 50000 + 15000);
+                const newOrders = currentOrders + 1;
+                const newCustomers = currentCustomers + 1;
+
+                revenueElement.textContent = `Rp ${newRevenue.toLocaleString('id-ID')}`;
+                ordersElement.textContent = newOrders;
+                customersElement.textContent = newCustomers;
+
+                // Add a subtle flash effect
+                [revenueElement, ordersElement, customersElement].forEach(el => {
+                    el.style.transform = 'scale(1.05)';
+                    el.style.transition = 'transform 0.3s ease';
+                    setTimeout(() => {
+                        el.style.transform = 'scale(1)';
+                    }, 300);
+                });
+            }
+        }
+
+        // Logout function
+        function logout() {
+            if (confirm('Apakah Anda yakin ingin logout?')) {
+                alert('Logout berhasil! Terima kasih.');
+                // In real app, this would redirect to login page
+                window.location.href = 'index.html';
+            }
+        }
+
+        // Navigation functions
+        function goToReports() {
+            window.location.href = 'laporan_page.html';
+        }
+
+        function goToMenu() {
+            window.location.href = 'menu_management.html';
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            updateDateTime();
+            
+            // Update date/time every minute
+            setInterval(updateDateTime, 60000);
+            
+            // Update stats every 30 seconds for demo
+            setInterval(updateStats, 30000);
+            
+            // Add loading animation to stats cards
+            const statCards = document.querySelectorAll('.stat-card');
+            statCards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    card.style.transition = 'all 0.6s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 200);
+            });
+        });
+
+        // Add some interactivity to demonstrate real-time updates
+        document.querySelectorAll('.stat-card').forEach(card => {
+            card.addEventListener('click', function() {
+                // Simulate clicking for more details
+                const cardType = this.className.split(' ')[1];
+                let message = '';
+                
+                switch(cardType) {
+                    case 'revenue':
+                        message = 'Detail Pendapatan:\n• Tunai: Rp 1,470,000 (60%)\n• Kartu: Rp 735,000 (30%)\n• Digital: Rp 245,000 (10%)';
+                        break;
+                    case 'orders':
+                        message = 'Detail Transaksi:\n• Dine-in: 52 transaksi\n• Take-away: 25 transaksi\n• Delivery: 10 transaksi';
+                        break;
+                    case 'menu':
+                        message = 'Detail Menu:\n• Makanan Utama: 12 item\n• Minuman: 8 item\n• Dessert: 4 item';
+                        break;
+                    case 'customers':
+                        message = 'Detail Pelanggan:\n• Pelanggan baru: 23 orang\n• Pelanggan tetap: 42 orang\n• Rata-rata per jam: 8 orang';
+                        break;
+                }
+                
+                alert(message);
+            });
+        });
+    </script>
+</body>
+</html>
